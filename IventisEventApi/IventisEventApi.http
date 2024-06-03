@@ -1,0 +1,6 @@
+@IventisEventApi_HostAddress = http://localhost:5250
+
+GET {{IventisEventApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
