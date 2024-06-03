@@ -8,6 +8,9 @@ namespace IventisEventApi.Models
         public string Name { get; set; }
         public GeoBoundingBox BoundingBox { get; set; }
         public int Capacity { get; set; }
-        
+
+        public ICollection<Event> Events { get; set; } = [];
+
+
     }
 }
