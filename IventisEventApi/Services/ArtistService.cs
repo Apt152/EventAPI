@@ -14,14 +14,19 @@ namespace IventisEventApi.Services
 
         public async Task AddArtistAsync(Artist artist)
         {
+            ValidateArtist(artist);
+            _context.Artists.Add(artist);
+            await _context.SaveChangesAsync();
+        }
+
+        private static void ValidateArtist(Artist artist)
+        {
             ArgumentNullException.ThrowIfNull(artist);
 
             if (!artist.IsComplete())
             {
                 throw new ArgumentException("Artist is missing fields and cannnot be added to the database");
             }
-            _context.Artists.Add(artist);
-            await _context.SaveChangesAsync();
         }
     }
 }
