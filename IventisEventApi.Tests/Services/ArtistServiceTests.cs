@@ -25,8 +25,8 @@ namespace IventisEventApi.Tests.Services
         {
             if (!_context.Artists.Any())
             {
-                _context.Artists.Add(new Models.Artist { Id = Guid.NewGuid(), Name = "John Doe", Genre = "Pop" });
-                _context.Artists.Add(new Models.Artist { Id = Guid.NewGuid(), Name = "Jane Doe", Genre = "Country" });
+                _context.Artists.Add(new Artist { Id = Guid.NewGuid(), Name = "John Doe", Genre = "Pop" });
+                _context.Artists.Add(new Artist { Id = Guid.NewGuid(), Name = "Jane Doe", Genre = "Country" });
                 _context.SaveChanges();
             }
         }
@@ -44,7 +44,7 @@ namespace IventisEventApi.Tests.Services
         }
 
         [Fact]
-        public async Task GetArtistByIdAsync_ReturnsNullForMissingUser()
+        public async Task GetArtistByIdAsync_ReturnsNullForMissingArtist()
         {
             Guid randomGuid = Guid.NewGuid();
 
