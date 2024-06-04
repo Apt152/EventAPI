@@ -25,8 +25,8 @@ namespace IventisEventApi.Tests.Services
         {
             if (!_context.Artists.Any())
             {
-                _context.Artists.Add(new Artist { Id = Guid.NewGuid(), Name = "John Doe", Genre = "Pop" });
-                _context.Artists.Add(new Artist { Id = Guid.NewGuid(), Name = "Jane Doe", Genre = "Country" });
+                _context.Artists.Add(DummyData.artist1);
+                _context.Artists.Add(DummyData.artist2);
                 _context.SaveChanges();
             }
         }
@@ -56,7 +56,7 @@ namespace IventisEventApi.Tests.Services
         [Fact]
         public async Task AddArtistAsync_AddsArtistSuccessfully()
         {
-            Artist newArtist = new() { Id = Guid.NewGuid(), Name = "John Smith", Genre = "Classical" };
+            Artist newArtist = DummyData.artist3;
             await _artistService.AddArtistAsync(newArtist);
             Artist? resultArtist = await _context.Artists.FindAsync(newArtist.Id);
 
