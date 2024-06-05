@@ -14,8 +14,6 @@ namespace IventisEventApi.Controllers
 
         private readonly ArtistService _artistService = new(context);
 
-
-
         [HttpGet(Name = "GetArtists")]
         public async Task<ActionResult<IEnumerable<Artist>>> Get()
         {

@@ -14,8 +14,6 @@ namespace IventisEventApi.Controllers
 
         private readonly VenueService _venueService = new(context);
 
-
-
         [HttpGet(Name = "GetVenues")]
         public async Task<ActionResult<IEnumerable<Venue>>> Get()
         {

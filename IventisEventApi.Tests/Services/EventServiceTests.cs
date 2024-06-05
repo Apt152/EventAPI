@@ -49,7 +49,7 @@ namespace IventisEventApi.Tests.Services
         public async Task GetEventByIdAsync_ReturnsCorrectEvent()
         {
             Event testEvent = await _context.Events.FirstAsync();
-            Event? resultEvent = await _EventService.GetEventById(testEvent.Id);
+            Event? resultEvent = await _EventService.GetEventByIdAsync(testEvent.Id);
 
             Assert.NotNull(resultEvent);
             Assert.Equal(testEvent.Id, resultEvent.Id);
@@ -63,7 +63,7 @@ namespace IventisEventApi.Tests.Services
         {
             Guid randomGuid = Guid.NewGuid();
 
-            Event? resultEvent = await _EventService.GetEventById(randomGuid);
+            Event? resultEvent = await _EventService.GetEventByIdAsync(randomGuid);
 
             Assert.Null(resultEvent);
         }
