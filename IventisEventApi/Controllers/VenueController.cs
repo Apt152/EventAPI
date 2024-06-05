@@ -41,6 +41,28 @@ namespace IventisEventApi.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost("create", Name = "CreateVenue")]
+        public async Task<ActionResult> CreateVenue(string name, string geoBoundingBox, int capacity)
+        {
+            try
+            {
+                GeoBoundingBox boundingBox = GeoBoundingBox.ConvertFromString(geoBoundingBox);
+                Venue venue = new() { Id = Guid.NewGuid(), Name = name, BoundingBox = boundingBox, Capacity = capacity };
+
+                await _venueService.AddVenueAsync(venue);
+                return CreatedAtAction(nameof(GetByField), new { id = venue.Id }, venue);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
+        }
     }
 
 

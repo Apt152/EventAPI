@@ -33,7 +33,7 @@
             string[] parts = values.Split("#");
             if (parts.Length != 4)
             {
-                throw new InvalidOperationException("Invalid bounding box format");
+                throw new InvalidOperationException("Invalid bounding box format. Format as \"lat1#long1#lat2#long2\".");
             }
 
             GeoLocation v1 = new GeoLocation(double.Parse(parts[0]), double.Parse(parts[1]));

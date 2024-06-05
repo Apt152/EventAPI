@@ -1,8 +1,10 @@
-﻿using IventisEventApi.Controllers;
+﻿using Azure.Core.GeoJson;
+using IventisEventApi.Controllers;
 using IventisEventApi.Database;
 using IventisEventApi.ModelFields;
 using IventisEventApi.Models;
 using IventisEventApi.Tests.Database;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -120,5 +122,47 @@ namespace IventisEventApi.Tests.Controllers
             Assert.IsType<NotFoundResult>(result.Result);
         }
 
+        [Fact]
+        public async Task CreateVenue_ReturnsCreatedAtActionUponSuccess()
+        {
+            Venue dummyVenue = DummyData.venue1;
+            ActionResult<Venue> result = await _venueController.CreateVenue(dummyVenue.Name, Models.GeoBoundingBox.ConvertToString(dummyVenue.BoundingBox), dummyVenue.Capacity);
+            
+            CreatedAtActionResult createdResult = Assert.IsType<CreatedAtActionResult>(result.Result);
+            Venue createdVenue = Assert.IsAssignableFrom<Venue>(createdResult.Value);
+            var verifiedVenue = await _context.Venues.FindAsync(createdVenue.Id);
+            Assert.NotNull(verifiedVenue);
+            Assert.Equal(createdVenue, verifiedVenue);
+        }
+
+        [Fact]
+        public async Task CreateVenue_ReturnsBadRequestForMissingName()
+        {
+            Venue dummyVenue = DummyData.venue1;
+
+            ActionResult<Venue> result = await _venueController.CreateVenue(null, Models.GeoBoundingBox.ConvertToString(dummyVenue.BoundingBox), dummyVenue.Capacity);
+            Assert.IsType<BadRequestObjectResult>(result.Result);
+
+            result = await _venueController.CreateVenue("", Models.GeoBoundingBox.ConvertToString(dummyVenue.BoundingBox), dummyVenue.Capacity);
+            Assert.IsType<BadRequestObjectResult>(result.Result);
+        }
+
+        [Fact]
+        public async Task CreateVenue_ReturnsBadRequestForIncorrectBoundingBox()
+        {
+            Venue dummyVenue = DummyData.venue1;
+
+            ActionResult<Venue> result = await _venueController.CreateVenue(dummyVenue.Name, "test", dummyVenue.Capacity);
+            Assert.IsType<BadRequestObjectResult>(result.Result);
+
+            result = await _venueController.CreateVenue("", "####", dummyVenue.Capacity);
+            Assert.IsType<BadRequestObjectResult>(result.Result);
+
+            result = await _venueController.CreateVenue("", "1234", dummyVenue.Capacity);
+            Assert.IsType<BadRequestObjectResult>(result.Result);
+
+            result = await _venueController.CreateVenue("", "", dummyVenue.Capacity);
+            Assert.IsType<BadRequestObjectResult>(result.Result);
+        }
     }
 }
