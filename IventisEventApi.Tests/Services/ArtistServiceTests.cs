@@ -1,6 +1,7 @@
 ﻿using IventisEventApi.Database;
 using IventisEventApi.Models;
 using IventisEventApi.Services;
+using IventisEventApi.Tests.Database;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -21,7 +22,7 @@ namespace IventisEventApi.Tests.Services
 
         public async Task InitializeAsync()
         {
-            await SeedDatabaseAsync();
+            await ArtistDatabaseSeeding.SeedWithDefaultArtists(_context);
         }
 
         public Task DisposeAsync()
@@ -30,20 +31,11 @@ namespace IventisEventApi.Tests.Services
             return Task.CompletedTask;
         }
 
-        private async Task SeedDatabaseAsync()
-        {
-            if (!_context.Artists.Any())
-            {
-                _context.Artists.AddRange(DummyData.artist1, DummyData.artist2);
-                await _context.SaveChangesAsync();
-            }
-        }
-
         [Fact]
         public async Task GetArtistByIdAsync_ReturnsCorrectArtist()
         {
             Artist testArtist = await _context.Artists.FirstAsync();
-            Artist? resultArtist = await _artistService.GetArtistById(testArtist.Id);
+            Artist? resultArtist = await _artistService.GetArtistByIdAsync(testArtist.Id);
 
             Assert.NotNull(resultArtist);
             Assert.Equal(testArtist.Id, resultArtist.Id);
@@ -56,7 +48,7 @@ namespace IventisEventApi.Tests.Services
         {
             Guid randomGuid = Guid.NewGuid();
 
-            Artist? resultArtist = await _artistService.GetArtistById(randomGuid);
+            Artist? resultArtist = await _artistService.GetArtistByIdAsync(randomGuid);
 
             Assert.Null(resultArtist);
         }
@@ -102,7 +94,7 @@ namespace IventisEventApi.Tests.Services
         [Fact]
         public async Task GetAllArtistsAsync_ReturnsEmptyListIfNone()
         {
-            await ClearArtistTableAsync();            
+            await ArtistDatabaseSeeding.ClearArtistTableAsync(_context);
 
             List<Artist> allArtists = await _artistService.GetAllArtistsAsync();
             Assert.Empty(allArtists);
@@ -111,31 +103,15 @@ namespace IventisEventApi.Tests.Services
         [Fact]
         public async Task GetAllArtistsAsync_GetsCorrectAmountWhenManyEntries()
         {
-            await ClearArtistTableAsync();
+            await ArtistDatabaseSeeding.ClearArtistTableAsync(_context);
 
             int amountOfEntries = 1000;
-            await CreateManyArtistEntries(amountOfEntries);
+            await ArtistDatabaseSeeding.CreateManyArtistEntries(_context, amountOfEntries);
 
             List<Artist> allArtists = await _artistService.GetAllArtistsAsync();
             Assert.Equal(amountOfEntries, allArtists.Count);
         }
 
-        private async Task CreateManyArtistEntries(int amount)
-        {
-            IEnumerable<Artist> newArtists = [];
-            for (int i = 0; i < amount; ++i)
-            {
-                newArtists = newArtists.Append(new Artist() { Id = Guid.NewGuid(), Name = "Artist" + i.ToString(), Genre = "Test" });
-            }
-            _context.Artists.AddRange(newArtists);
-            await _context.SaveChangesAsync();
-        }
-
-        private async Task ClearArtistTableAsync()
-        {
-            List<Artist> artistsInTable = await _context.Artists.ToListAsync();
-            _context.Artists.RemoveRange(artistsInTable);
-            await _context.SaveChangesAsync();
-        }
+        
     }
 }
