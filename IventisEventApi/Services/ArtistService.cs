@@ -13,7 +13,7 @@ namespace IventisEventApi.Services
             return await _context.Artists.ToListAsync();
         }
 
-        public async Task<Artist?> GetArtistById(Guid artistId)
+        public async Task<Artist?> GetArtistByIdAsync(Guid artistId)
         {
             return await _context.Artists.FindAsync(artistId);
         }
