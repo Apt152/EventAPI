@@ -1,4 +1,5 @@
 using IventisEventApi.Database;
+using IventisEventApi.Models;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<EventDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddControllers().AddJsonOptions(options =>
+    { options.JsonSerializerOptions.Converters.Add(new GeoBoundingBoxConverter()); });
 
 var app = builder.Build();
 
