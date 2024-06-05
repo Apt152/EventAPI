@@ -13,9 +13,11 @@ namespace IventisEventApi.Database
         public static readonly Artist artist3 = new() { Id = Guid.NewGuid(), Name = "John Smith", Genre = "Classical" };
         public static readonly Artist artist4 = new() { Id = Guid.NewGuid(), Name = "John Smith", Genre = "Pop" };
 
-
         public static readonly Event event1 = new() { Id = Guid.NewGuid(), Name = "Event 1", Date = new DateOnly(2024, 6, 4), VenueId = venue1.Id };
         public static readonly Event event2 = new() { Id = Guid.NewGuid(), Name = "Event 2", Date = new DateOnly(2025, 6, 4), VenueId = venue2.Id };
         public static readonly Event event3 = new() { Id = Guid.NewGuid(), Name = "Event 3", Date = new DateOnly(2024, 6, 7), VenueId = venue1.Id };
+
+        public static readonly GeoBoundingBox boundingBox1 = new(1.0, 2.0, 3.0, 4.0);
+        public static readonly GeoBoundingBox boundingBox2 = new(5.0, 6.0, 7.0, 8.0);
     }
 }

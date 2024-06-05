@@ -1,5 +1,7 @@
 ﻿using IventisEventApi.Database;
+using IventisEventApi.ModelFields;
 using IventisEventApi.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace IventisEventApi.Services
 {
@@ -7,9 +9,33 @@ namespace IventisEventApi.Services
     {
         private readonly EventDbContext _context = context;
 
-        public async Task<Venue?> GetVenueById(Guid venueId)
+        public async Task<List<Venue>> GetAllVenuesAsync()
+        {
+            return await _context.Venues.ToListAsync();
+        }
+
+        public async Task<List<Venue>> GetVenueByQueryAsync(VenueFields fieldName, string query)
+        {
+            switch (fieldName)
+            {
+                case VenueFields.Id:
+                    Venue? venue = await GetVenueByIdAsync(Guid.Parse(query));
+                    return [venue];
+                case VenueFields.Name:
+                    return await GetVenueByNameAsync(query);
+                default:
+                    throw new ArgumentException("Invalid field name");
+            }
+        }
+
+        public async Task<Venue?> GetVenueByIdAsync(Guid venueId)
         {
             return await _context.Venues.FindAsync(venueId);
+        }
+
+        public async Task<List<Venue>> GetVenueByNameAsync(string venueName)
+        {
+            return await _context.Venues.Where(e => e.Name == venueName).ToListAsync();
         }
 
         public async Task AddVenueAsync(Venue venue)

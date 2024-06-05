@@ -43,7 +43,7 @@ namespace IventisEventApi.Tests.Services
         public async Task GetVenueByIdAsync_ReturnsCorrectVenue()
         {
             Venue testVenue = await _context.Venues.FirstAsync();
-            Venue? resultVenue = await _venueService.GetVenueById(testVenue.Id);
+            Venue? resultVenue = await _venueService.GetVenueByIdAsync(testVenue.Id);
 
             Assert.NotNull(resultVenue);
             Assert.Equal(testVenue.Id, resultVenue.Id);
@@ -57,7 +57,7 @@ namespace IventisEventApi.Tests.Services
         {
             Guid randomGuid = Guid.NewGuid();
 
-            Venue? resultVenue = await _venueService.GetVenueById(randomGuid);
+            Venue? resultVenue = await _venueService.GetVenueByIdAsync(randomGuid);
 
             Assert.Null(resultVenue);
         }

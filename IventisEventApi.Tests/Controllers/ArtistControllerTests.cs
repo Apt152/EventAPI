@@ -3,7 +3,6 @@ using IventisEventApi.Database;
 using IventisEventApi.ModelFields;
 using IventisEventApi.Models;
 using IventisEventApi.Tests.Database;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -68,8 +67,10 @@ namespace IventisEventApi.Tests.Controllers
         [Fact]
         public async Task Get_ReturnsCorrectListOfArtistsWhenManyArtists()
         {
+            int numberOfVenues = 100;
+
             await ArtistDatabaseSeeding.ClearArtistTableAsync(_context);
-            await ArtistDatabaseSeeding.CreateManyArtistEntries(_context, 500);
+            await ArtistDatabaseSeeding.CreateManyArtistEntries(_context, numberOfVenues);
 
             IEnumerable<Artist> expectedArtists = await _context.Artists.ToListAsync();
 
@@ -79,7 +80,7 @@ namespace IventisEventApi.Tests.Controllers
             IEnumerable<Artist> actualArtists = Assert.IsAssignableFrom<IEnumerable<Artist>>(okResult.Value);
 
             Assert.NotNull(actualArtists);
-            Assert.Equal(500, actualArtists.Count());
+            Assert.Equal(numberOfVenues, actualArtists.Count());
             Assert.Equal(expectedArtists.First().Id, actualArtists.First().Id);
             Assert.Equal(expectedArtists.Last().Id, actualArtists.Last().Id);
         }

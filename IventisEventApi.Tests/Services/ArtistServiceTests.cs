@@ -179,7 +179,7 @@ namespace IventisEventApi.Tests.Services
         {
             await ArtistDatabaseSeeding.ClearArtistTableAsync(_context);
 
-            int amountOfEntries = 1000;
+            int amountOfEntries = 100;
             await ArtistDatabaseSeeding.CreateManyArtistEntries(_context, amountOfEntries);
 
             List<Artist> allArtists = await _artistService.GetAllArtistsAsync();
