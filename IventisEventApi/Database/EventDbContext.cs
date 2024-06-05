@@ -1,8 +1,6 @@
 ﻿using IventisEventApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using System.Net.NetworkInformation;
-using System.Xml.Linq;
 
 namespace IventisEventApi.Database
 {

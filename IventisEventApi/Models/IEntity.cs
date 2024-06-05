@@ -1,6 +1,4 @@
-﻿using System.Xml.Linq;
-
-namespace IventisEventApi.Models
+﻿namespace IventisEventApi.Models
 {
     public interface IEntity
     {

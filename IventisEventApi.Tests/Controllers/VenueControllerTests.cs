@@ -1,10 +1,8 @@
-﻿using Azure.Core.GeoJson;
-using IventisEventApi.Controllers;
+﻿using IventisEventApi.Controllers;
 using IventisEventApi.Database;
 using IventisEventApi.ModelFields;
 using IventisEventApi.Models;
 using IventisEventApi.Tests.Database;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

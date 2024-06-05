@@ -2,7 +2,6 @@
 using IventisEventApi.Models;
 using IventisEventApi.Services;
 using Microsoft.EntityFrameworkCore;
-using Xunit;
 
 
 namespace IventisEventApi.Tests.Services
