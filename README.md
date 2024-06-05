@@ -31,6 +31,10 @@ https://youtu.be/lyXX1yGiz30
 
 All packages should be able to be installed by navigating to each project folder and running `dotnet restore`
 
+You can build the project using `dotnet build`
+You can run the project using `dotnet run` in the project folder
+You can run the tests using `dotnet test` in the test project folder
+
 ## Database Setup
 To setup the database follow the following instructions:
 1. In command prompt, navigate to ./IventisEventApi
