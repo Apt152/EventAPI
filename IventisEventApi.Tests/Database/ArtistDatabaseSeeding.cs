@@ -34,5 +34,11 @@ namespace IventisEventApi.Tests.Database
             context.Artists.RemoveRange(artistsInTable);
             await context.SaveChangesAsync();
         }
+
+        public static async Task RevertToSeeded(EventDbContext context)
+        {
+            await ClearArtistTableAsync(context);
+            await SeedWithDefaultArtists(context);
+        }
     }
 }

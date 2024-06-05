@@ -1,16 +1,12 @@
 ﻿using IventisEventApi.Controllers;
 using IventisEventApi.Database;
+using IventisEventApi.ModelFields;
 using IventisEventApi.Models;
-using IventisEventApi.Services;
 using IventisEventApi.Tests.Database;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace IventisEventApi.Tests.Controllers
 {
@@ -42,7 +38,10 @@ namespace IventisEventApi.Tests.Controllers
         public async Task Get_ReturnsCorrectListOfArtists()
         {
             IEnumerable<Artist> expectedArtists = await _context.Artists.ToListAsync();
-            IEnumerable<Artist> actualArtists = await _artistController.Get();
+            ActionResult<IEnumerable<Artist>> result = await _artistController.Get();
+            OkObjectResult okResult = Assert.IsType<OkObjectResult>(result.Result);
+
+            IEnumerable<Artist> actualArtists = Assert.IsAssignableFrom<IEnumerable<Artist>>(okResult.Value);
 
             Assert.NotNull(actualArtists);
             Assert.Equal(expectedArtists.Count(), actualArtists.Count());
@@ -55,7 +54,11 @@ namespace IventisEventApi.Tests.Controllers
         {
             await ArtistDatabaseSeeding.ClearArtistTableAsync(_context);
 
-            IEnumerable<Artist> artists = await _artistController.Get();
+            ActionResult<IEnumerable<Artist>> result = await _artistController.Get();
+
+            OkObjectResult okResult = Assert.IsType<OkObjectResult>(result.Result);
+            IEnumerable<Artist> artists = Assert.IsAssignableFrom<IEnumerable<Artist>>(okResult.Value);
+
             Assert.NotNull(artists);
             Assert.Empty(artists);
 
@@ -69,12 +72,50 @@ namespace IventisEventApi.Tests.Controllers
             await ArtistDatabaseSeeding.CreateManyArtistEntries(_context, 500);
 
             IEnumerable<Artist> expectedArtists = await _context.Artists.ToListAsync();
-            IEnumerable<Artist> actualArtists = await _artistController.Get();
+
+            ActionResult<IEnumerable<Artist>> result = await _artistController.Get();
+            OkObjectResult okResult = Assert.IsType<OkObjectResult>(result.Result);
+
+            IEnumerable<Artist> actualArtists = Assert.IsAssignableFrom<IEnumerable<Artist>>(okResult.Value);
 
             Assert.NotNull(actualArtists);
             Assert.Equal(500, actualArtists.Count());
             Assert.Equal(expectedArtists.First().Id, actualArtists.First().Id);
             Assert.Equal(expectedArtists.Last().Id, actualArtists.Last().Id);
+        }
+
+        [Fact]
+        public async Task GetByField_ReturnsBadRequestOnArgumentException()
+        {
+            ActionResult<IEnumerable<Artist>> result = await _artistController.GetByField(ArtistFields.Invalid, "Test");
+
+            Assert.IsType<BadRequestObjectResult>(result.Result);
+        }
+
+        [Fact]
+        public async Task GetByField_ReturnsOkOnValidRequest()
+        {
+            ActionResult<IEnumerable<Artist>> result = await _artistController.GetByField(ArtistFields.Id, DummyData.artist1.Id.ToString());
+            Assert.IsType<OkObjectResult>(result.Result);
+
+            result = await _artistController.GetByField(ArtistFields.Name, DummyData.artist1.Name);
+            Assert.IsType<OkObjectResult>(result.Result);
+
+            result = await _artistController.GetByField(ArtistFields.Genre, DummyData.artist1.Genre);
+            Assert.IsType<OkObjectResult>(result.Result);
+        }
+
+        [Fact]
+        public async Task GetByField_ReturnsNotFoundOnEmptyRequestReturn()
+        {
+            ActionResult<IEnumerable<Artist>> result = await _artistController.GetByField(ArtistFields.Id, Guid.NewGuid().ToString());
+            Assert.IsType<NotFoundResult>(result.Result);
+
+            result = await _artistController.GetByField(ArtistFields.Name, "");
+            Assert.IsType<NotFoundResult>(result.Result);
+
+            result = await _artistController.GetByField(ArtistFields.Genre, "");
+            Assert.IsType<NotFoundResult>(result.Result);
         }
 
     }

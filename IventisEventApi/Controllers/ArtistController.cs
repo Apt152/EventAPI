@@ -1,4 +1,5 @@
 ﻿using IventisEventApi.Database;
+using IventisEventApi.ModelFields;
 using IventisEventApi.Models;
 using IventisEventApi.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -16,10 +17,31 @@ namespace IventisEventApi.Controllers
 
 
         [HttpGet(Name = "GetArtists")]
-        public async Task<IEnumerable<Artist>> Get()
+        public async Task<ActionResult<IEnumerable<Artist>>> Get()
         {
             IEnumerable<Artist> allArtists = await _artistService.GetAllArtistsAsync();
-            return allArtists;
+            return Ok(allArtists);
+        }
+
+        [HttpGet("artistsByField", Name = "GetArtistsByField")]
+        public async Task<ActionResult<IEnumerable<Artist>>> GetByField([FromQuery] ArtistFields field, [FromQuery] string query)
+        {
+            try
+            {
+                IEnumerable<Artist> artists = await _artistService.GetArtistByQueryAsync(field, query);
+                if (artists.Any() && artists.First() != null)
+                {
+                    return Ok(artists);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 
