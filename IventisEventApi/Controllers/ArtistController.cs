@@ -41,8 +41,28 @@ namespace IventisEventApi.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("artistsByEventId", Name = "GetArtistsByEventId")]
+        public async Task<ActionResult<IEnumerable<Artist>>> GetByEventId([FromQuery] string eventId)
+        {
+            try
+            {
+                IEnumerable<Artist> artists = await _artistService.GetArtistsByEventAsync(Guid.Parse(eventId));
+                if (artists.Any())
+                {
+                    return Ok(artists);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
-
-
 
 }

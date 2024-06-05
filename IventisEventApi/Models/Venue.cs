@@ -1,4 +1,6 @@
-﻿namespace IventisEventApi.Models
+﻿using System.Text.Json.Serialization;
+
+namespace IventisEventApi.Models
 {
     public class Venue : IEntity
     {
@@ -6,7 +8,7 @@
         public string? Name { get; set; }
         public GeoBoundingBox BoundingBox { get; set; }
         public int Capacity { get; set; }
-
+        [JsonIgnore]
         public ICollection<Event> Events { get; set; } = [];
 
         public bool IsComplete()

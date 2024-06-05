@@ -45,6 +45,14 @@ namespace IventisEventApi.Services
             return await _context.Artists.Where(e => e.Genre == artistGenre).ToListAsync();
         }
 
+        public async Task<List<Artist>> GetArtistsByEventAsync(Guid eventId)
+        {
+            List<EventArtist> eventArtists = await _context.EventsArtists.Include(e => e.Artist).Where(e => e.EventId == eventId).ToListAsync();
+            List<Artist> artists = eventArtists.Select(e => e.Artist).ToList();
+            return artists;
+        }
+
+
         public async Task AddArtistAsync(Artist artist)
         {
             ValidateArtist(artist);

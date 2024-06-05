@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace IventisEventApi.Models
 {
     public class Event : IEntity
@@ -8,7 +10,7 @@ namespace IventisEventApi.Models
         public Guid VenueId { get; set; }
         public Venue Venue { get; set; } = null!;
 
-
+        [JsonIgnore]
         public ICollection<EventArtist> EventArtists { get; set; } = [];
 
         public bool IsComplete()

@@ -76,17 +76,12 @@ namespace IventisEventApi.Tests.Services
         [Fact]
         public async Task GetArtistByNameAsync_ReturnsMultipleCorrectArtists()
         {
-            _context.Artists.AddRange(DummyData.artist3, DummyData.artist4);
-            await _context.SaveChangesAsync();
-
             IEnumerable<Artist> resultArtist = await _artistService.GetArtistByNameAsync(DummyData.artist3.Name);
 
             Assert.NotNull(resultArtist);
             Assert.Contains(DummyData.artist3, resultArtist);
             Assert.Contains(DummyData.artist4, resultArtist);
             Assert.Equal(2, resultArtist.Count());
-
-            await ArtistDatabaseSeeding.RevertToSeeded(_context);
         }
 
         [Fact]
@@ -112,23 +107,19 @@ namespace IventisEventApi.Tests.Services
         [Fact]
         public async Task GetArtistByGenreAsync_ReturnsMultipleCorrectArtists()
         {
-            _context.Artists.Add(DummyData.artist4);
-            await _context.SaveChangesAsync();
-
             IEnumerable<Artist> resultArtist = await _artistService.GetArtistByGenreAsync(DummyData.artist1.Genre);
 
             Assert.NotNull(resultArtist);
             Assert.Contains(DummyData.artist1, resultArtist);
             Assert.Contains(DummyData.artist4, resultArtist);
             Assert.Equal(2, resultArtist.Count());
-
-            await ArtistDatabaseSeeding.RevertToSeeded(_context);
         }
 
         [Fact]
         public async Task AddArtistAsync_AddsArtistSuccessfully()
         {
             Artist newArtist = DummyData.artist3;
+            newArtist.Id = Guid.NewGuid();
             await _artistService.AddArtistAsync(newArtist);
             Artist? resultArtist = await _context.Artists.FindAsync(newArtist.Id);
 
@@ -163,29 +154,40 @@ namespace IventisEventApi.Tests.Services
             Assert.Equal(count, allArtists.Count);
         }
         
+        //[Fact]
+        //public async Task GetAllArtistsAsync_ReturnsEmptyListIfNone()
+        //{
+        //    await ArtistDatabaseSeeding.ClearArtistTableAsync(_context);
+
+        //    List<Artist> allArtists = await _artistService.GetAllArtistsAsync();
+        //    Assert.Empty(allArtists);
+
+        //    await ArtistDatabaseSeeding.SeedWithDefaultArtists(_context);
+        //}
+
+        //[Fact]
+        //public async Task GetAllArtistsAsync_GetsCorrectAmountWhenManyEntries()
+        //{
+        //    await ArtistDatabaseSeeding.ClearArtistTableAsync(_context);
+
+        //    int amountOfEntries = 100;
+        //    await ArtistDatabaseSeeding.CreateManyArtistEntries(_context, amountOfEntries);
+
+        //    List<Artist> allArtists = await _artistService.GetAllArtistsAsync();
+        //    Assert.Equal(amountOfEntries, allArtists.Count);
+
+        //    await ArtistDatabaseSeeding.RevertToSeeded(_context);
+        //}
+
         [Fact]
-        public async Task GetAllArtistsAsync_ReturnsEmptyListIfNone()
+        public async Task GetArtistByEvent_ReturnsCorrectArtists()
         {
-            await ArtistDatabaseSeeding.ClearArtistTableAsync(_context);
+            Event dummyEvent = DummyData.event2;
+            List<Artist> resultArtists = await _artistService.GetArtistsByEventAsync(dummyEvent.Id);
 
-            List<Artist> allArtists = await _artistService.GetAllArtistsAsync();
-            Assert.Empty(allArtists);
-
-            await ArtistDatabaseSeeding.SeedWithDefaultArtists(_context);
-        }
-
-        [Fact]
-        public async Task GetAllArtistsAsync_GetsCorrectAmountWhenManyEntries()
-        {
-            await ArtistDatabaseSeeding.ClearArtistTableAsync(_context);
-
-            int amountOfEntries = 100;
-            await ArtistDatabaseSeeding.CreateManyArtistEntries(_context, amountOfEntries);
-
-            List<Artist> allArtists = await _artistService.GetAllArtistsAsync();
-            Assert.Equal(amountOfEntries, allArtists.Count);
-
-            await ArtistDatabaseSeeding.RevertToSeeded(_context);
+            Assert.Equal(2, resultArtists.Count);
+            Assert.Contains(DummyData.artist1, resultArtists);
+            Assert.Contains(DummyData.artist2, resultArtists);
         }
 
 

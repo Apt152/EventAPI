@@ -1,10 +1,13 @@
-﻿namespace IventisEventApi.Models
+﻿using System.Text.Json.Serialization;
+
+namespace IventisEventApi.Models
 {
     public class Artist : IEntity
     {
         public Guid Id { get; set; }
         public string? Name { get; set; }
         public string? Genre { get; set; }
+        [JsonIgnore]
         public ICollection<EventArtist> EventArtists { get; set; } = [];
 
 

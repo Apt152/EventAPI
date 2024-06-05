@@ -13,7 +13,10 @@ namespace IventisEventApi.Tests.Database
             {
                 await ClearArtistTableAsync(context);
             }
-            context.Artists.AddRange(DummyData.artist1, DummyData.artist2);
+            context.Artists.AddRange(DummyData.artist1, DummyData.artist2, DummyData.artist3, DummyData.artist4);
+            context.Venues.AddRange(DummyData.venue1,  DummyData.venue2);
+            context.Events.AddRange(DummyData.event1, DummyData.event2, DummyData.event3);
+            context.EventsArtists.AddRange(DummyData.eventArtist1,  DummyData.eventArtist2, DummyData.eventArtist3);
             await context.SaveChangesAsync();
         }
 
