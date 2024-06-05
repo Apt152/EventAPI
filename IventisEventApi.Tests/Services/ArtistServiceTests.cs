@@ -90,5 +90,52 @@ namespace IventisEventApi.Tests.Services
 
             Assert.Null(resultArtist);
         }
+
+        [Fact]
+        public async Task GetAllArtistsAsync_GetsCorrectAmount()
+        {
+            int count = _context.Artists.Count();
+            List<Artist> allArtists = await _artistService.GetAllArtistsAsync();
+            Assert.Equal(count, allArtists.Count);
+        }
+        
+        [Fact]
+        public async Task GetAllArtistsAsync_ReturnsEmptyListIfNone()
+        {
+            await ClearArtistTableAsync();            
+
+            List<Artist> allArtists = await _artistService.GetAllArtistsAsync();
+            Assert.Empty(allArtists);
+        }
+
+        [Fact]
+        public async Task GetAllArtistsAsync_GetsCorrectAmountWhenManyEntries()
+        {
+            await ClearArtistTableAsync();
+
+            int amountOfEntries = 1000;
+            await CreateManyArtistEntries(amountOfEntries);
+
+            List<Artist> allArtists = await _artistService.GetAllArtistsAsync();
+            Assert.Equal(amountOfEntries, allArtists.Count);
+        }
+
+        private async Task CreateManyArtistEntries(int amount)
+        {
+            IEnumerable<Artist> newArtists = [];
+            for (int i = 0; i < amount; ++i)
+            {
+                newArtists = newArtists.Append(new Artist() { Id = Guid.NewGuid(), Name = "Artist" + i.ToString(), Genre = "Test" });
+            }
+            _context.Artists.AddRange(newArtists);
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task ClearArtistTableAsync()
+        {
+            List<Artist> artistsInTable = await _context.Artists.ToListAsync();
+            _context.Artists.RemoveRange(artistsInTable);
+            await _context.SaveChangesAsync();
+        }
     }
 }

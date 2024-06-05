@@ -1,11 +1,17 @@
 ﻿using IventisEventApi.Database;
 using IventisEventApi.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace IventisEventApi.Services
 {
     public class ArtistService(EventDbContext context)
     {
         private readonly EventDbContext _context = context;
+
+        public async Task<List<Artist>> GetAllArtistsAsync()
+        {
+            return await _context.Artists.ToListAsync();
+        }
 
         public async Task<Artist?> GetArtistById(Guid artistId)
         {
