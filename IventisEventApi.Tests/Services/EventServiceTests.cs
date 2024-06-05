@@ -2,11 +2,12 @@
 using IventisEventApi.Models;
 using IventisEventApi.Services;
 using Microsoft.EntityFrameworkCore;
+using Xunit;
 
 
 namespace IventisEventApi.Tests.Services
 {
-    public class EventServiceTests
+    public class EventServiceTests : IAsyncLifetime
     {
         private readonly DbContextOptions<EventDbContext> _options;
         private readonly EventDbContext _context;
@@ -14,22 +15,33 @@ namespace IventisEventApi.Tests.Services
 
         public EventServiceTests()
         {
-            _options = new DbContextOptionsBuilder<EventDbContext>().UseInMemoryDatabase(databaseName: "TestDatabase").Options;
+            _options = new DbContextOptionsBuilder<EventDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
             _context = new EventDbContext(_options);
             _EventService = new EventService(_context);
-
-            SeedDatabase();
         }
 
-        private void SeedDatabase()
+        public async Task InitializeAsync()
         {
+            await SeedDatabaseAsync();
+        }
+
+        public Task DisposeAsync()
+        {
+            _context.Dispose();
+            return Task.CompletedTask;
+        }
+
+        private async Task SeedDatabaseAsync()
+        {
+            if (!_context.Venues.Any())
+            {
+                _context.Venues.AddRange(DummyData.venue1, DummyData.venue2);
+                await _context.SaveChangesAsync();
+            }
             if (!_context.Events.Any())
-            {   
-                _context.Venues.Add(DummyData.venue1);
-                _context.Venues.Add(DummyData.venue2);
-                _context.Events.Add(DummyData.event1);
-                _context.Events.Add(DummyData.event2);
-                _context.SaveChanges();
+            {
+                _context.Events.AddRange(DummyData.event1, DummyData.event2);
+                await _context.SaveChangesAsync();
             }
         }
 

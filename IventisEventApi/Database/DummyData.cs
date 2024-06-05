@@ -2,7 +2,7 @@
 
 namespace IventisEventApi.Database
 {
-    public class DummyData
+    public readonly struct DummyData
     {
         public static readonly Venue venue1 = new() { Id = Guid.NewGuid(), Name = "Venue 1", Capacity = 100, BoundingBox = new GeoBoundingBox(53.228317, -0.546745, 53.228295, -0.548888) };
         public static readonly Venue venue2 = new() { Id = Guid.NewGuid(), Name = "Venue 2", Capacity = 50, BoundingBox = new GeoBoundingBox(52.912500, -1.183384, 52.909932, -1.186041) };

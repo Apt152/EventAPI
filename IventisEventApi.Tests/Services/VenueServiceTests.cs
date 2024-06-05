@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IventisEventApi.Tests.Services
 {
-    public class VenueServiceTests
+    public class VenueServiceTests : IAsyncLifetime
     {
         private readonly DbContextOptions<EventDbContext> _options;
         private readonly EventDbContext _context;
@@ -14,20 +14,28 @@ namespace IventisEventApi.Tests.Services
 
         public VenueServiceTests()
         {
-            _options = new DbContextOptionsBuilder<EventDbContext>().UseInMemoryDatabase(databaseName: "TestDatabase").Options;
+            _options = new DbContextOptionsBuilder<EventDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
             _context = new EventDbContext(_options);
             _venueService = new VenueService(_context);
-
-            SeedDatabase();
         }
 
-        private void SeedDatabase()
+        public async Task InitializeAsync()
+        {
+            await SeedDatabaseAsync();
+        }
+
+        public Task DisposeAsync()
+        {
+            _context.Dispose();
+            return Task.CompletedTask;
+        }
+
+        private async Task SeedDatabaseAsync()
         {
             if (!_context.Venues.Any())
             {
-                _context.Venues.Add(new Venue { Id = Guid.NewGuid(), Name = "Venue 1", Capacity = 100, BoundingBox = new GeoBoundingBox(53.228317, -0.546745, 53.228295, -0.548888) });
-                _context.Venues.Add(new Venue { Id = Guid.NewGuid(), Name = "Venue 2", Capacity = 50, BoundingBox = new GeoBoundingBox(52.912500, -1.183384, 52.909932, -1.186041) });
-                _context.SaveChanges();
+                _context.Venues.AddRange(DummyData.venue1, DummyData.venue2);
+                await _context.SaveChangesAsync();
             }
         }
 

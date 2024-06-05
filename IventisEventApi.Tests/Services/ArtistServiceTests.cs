@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IventisEventApi.Tests.Services
 {
-    public class ArtistServiceTests
+    public class ArtistServiceTests : IAsyncLifetime
     {
         private readonly DbContextOptions<EventDbContext> _options;
         private readonly EventDbContext _context;
@@ -14,20 +14,28 @@ namespace IventisEventApi.Tests.Services
 
         public ArtistServiceTests()
         {
-            _options = new DbContextOptionsBuilder<EventDbContext>().UseInMemoryDatabase(databaseName: "TestDatabase").Options;
+            _options = new DbContextOptionsBuilder<EventDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
             _context = new EventDbContext(_options);
             _artistService = new ArtistService(_context);
-
-            SeedDatabase();
         }
 
-        private void SeedDatabase()
+        public async Task InitializeAsync()
+        {
+            await SeedDatabaseAsync();
+        }
+
+        public Task DisposeAsync()
+        {
+            _context.Dispose();
+            return Task.CompletedTask;
+        }
+
+        private async Task SeedDatabaseAsync()
         {
             if (!_context.Artists.Any())
             {
-                _context.Artists.Add(DummyData.artist1);
-                _context.Artists.Add(DummyData.artist2);
-                _context.SaveChanges();
+                _context.Artists.AddRange(DummyData.artist1, DummyData.artist2);
+                await _context.SaveChangesAsync();
             }
         }
 
