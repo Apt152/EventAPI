@@ -1,54 +1,29 @@
 ﻿using IventisEventApi.Database;
 using IventisEventApi.Models;
 using IventisEventApi.Services;
+using IventisEventApi.Tests.Database;
 using Microsoft.EntityFrameworkCore;
 
 
 namespace IventisEventApi.Tests.Services
 {
-    public class EventServiceTests : IAsyncLifetime
+    public class EventServiceTests
     {
-        private readonly DbContextOptions<EventDbContext> _options;
-        private readonly EventDbContext _context;
-        private readonly EventService _EventService;
+        private EventDatabaseSeeding _eventDbSeeding;
 
         public EventServiceTests()
         {
-            _options = new DbContextOptionsBuilder<EventDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
-            _context = new EventDbContext(_options);
-            _EventService = new EventService(_context);
-        }
-
-        public async Task InitializeAsync()
-        {
-            await SeedDatabaseAsync();
-        }
-
-        public Task DisposeAsync()
-        {
-            _context.Dispose();
-            return Task.CompletedTask;
-        }
-
-        private async Task SeedDatabaseAsync()
-        {
-            if (!_context.Venues.Any())
-            {
-                _context.Venues.AddRange(DummyData.venue1, DummyData.venue2);
-                await _context.SaveChangesAsync();
-            }
-            if (!_context.Events.Any())
-            {
-                _context.Events.AddRange(DummyData.event1, DummyData.event2);
-                await _context.SaveChangesAsync();
-            }
+            _eventDbSeeding = new();
         }
 
         [Fact]
         public async Task GetEventByIdAsync_ReturnsCorrectEvent()
         {
-            Event testEvent = await _context.Events.FirstAsync();
-            Event? resultEvent = await _EventService.GetEventByIdAsync(testEvent.Id);
+            using EventDbContext dbContext = await _eventDbSeeding.CreateNewDatabase();
+            EventService eventService = new(dbContext);
+
+            Event testEvent = await dbContext.Events.FirstAsync();
+            Event? resultEvent = await eventService.GetEventByIdAsync(testEvent.Id);
 
             Assert.NotNull(resultEvent);
             Assert.Equal(testEvent.Id, resultEvent.Id);
@@ -60,9 +35,12 @@ namespace IventisEventApi.Tests.Services
         [Fact]
         public async Task GetEventByIdAsync_ReturnsNullForMissingEvent()
         {
+            using EventDbContext dbContext = await _eventDbSeeding.CreateNewDatabase();
+            EventService eventService = new(dbContext);
+
             Guid randomGuid = Guid.NewGuid();
 
-            Event? resultEvent = await _EventService.GetEventByIdAsync(randomGuid);
+            Event? resultEvent = await eventService.GetEventByIdAsync(randomGuid);
 
             Assert.Null(resultEvent);
         }
@@ -70,11 +48,14 @@ namespace IventisEventApi.Tests.Services
         [Fact]
         public async Task AddEventAsync_AddsEventSuccessfully()
         {
-            Venue newVenue = DummyData.venue3;
-            await _context.Venues.AddAsync(newVenue);
-            Event newEvent = DummyData.event3;
-            await _EventService.AddEventAsync(newEvent);
-            Event? resultEvent = await _context.Events.FindAsync(newEvent.Id);
+            using EventDbContext dbContext = await _eventDbSeeding.CreateNewDatabase();
+            EventService eventService = new(dbContext);
+
+            Venue newVenue = new() { Id = Guid.NewGuid(), Name = "Test Venue", Capacity = 50, BoundingBox = new GeoBoundingBox(52.953662, -1.150368, 52.953197, -1.149475) };
+            await dbContext.Venues.AddAsync(newVenue);
+            Event newEvent = new() { Id = Guid.NewGuid(), Name = "Test Event", Date = new DateOnly(2024, 6, 4), VenueId = newVenue.Id }; ;
+            await eventService.AddEventAsync(newEvent);
+            Event? resultEvent = await dbContext.Events.FindAsync(newEvent.Id);
 
             Assert.NotNull(resultEvent);
             Assert.Equal(newEvent.Id, resultEvent.Id);
@@ -86,16 +67,22 @@ namespace IventisEventApi.Tests.Services
         [Fact]
         public async Task AddEventAsync_DoesNotAddNullEvent()
         {
+            using EventDbContext dbContext = await _eventDbSeeding.CreateNewDatabase();
+            EventService eventService = new(dbContext);
+
             Event? incompleteEvent = null;
-            await Assert.ThrowsAsync<ArgumentNullException>(() => _EventService.AddEventAsync(incompleteEvent));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => eventService.AddEventAsync(incompleteEvent));
         }
 
         [Fact]
         public async Task AddEventAsync_DoesNotAddIncompleteEvent()
         {
+            using EventDbContext dbContext = await _eventDbSeeding.CreateNewDatabase();
+            EventService eventService = new(dbContext);
+
             Event incompleteEvent = new() { Id = Guid.NewGuid() };
-            await Assert.ThrowsAsync<ArgumentException>(() => _EventService.AddEventAsync(incompleteEvent));
-            Event? resultEvent = await _context.Events.FindAsync(incompleteEvent.Id);
+            await Assert.ThrowsAsync<ArgumentException>(() => eventService.AddEventAsync(incompleteEvent));
+            Event? resultEvent = await dbContext.Events.FindAsync(incompleteEvent.Id);
 
             Assert.Null(resultEvent);
         }
@@ -103,8 +90,11 @@ namespace IventisEventApi.Tests.Services
         [Fact]
         public async Task AddEventAsync_DoesNotAddEventWithUnknownVenue()
         {
+            using EventDbContext dbContext = await _eventDbSeeding.CreateNewDatabase();
+            EventService eventService = new(dbContext);
+
             Event newEvent = new() { Id = Guid.NewGuid(), Name = "Event 4", Date = new DateOnly(2024, 12, 29), VenueId = Guid.NewGuid() };
-            await Assert.ThrowsAsync<ArgumentException>(() => _EventService.AddEventAsync(newEvent));
+            await Assert.ThrowsAsync<ArgumentException>(() => eventService.AddEventAsync(newEvent));
         }
     }
 }

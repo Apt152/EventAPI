@@ -7,14 +7,33 @@ namespace IventisEventApi.Tests.Database
 {
     internal class EventDatabaseSeeding
     {
+        public async Task<EventDbContext> CreateNewDatabase()
+        {
+            DbContextOptions<EventDbContext> options = new DbContextOptionsBuilder<EventDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
+            EventDbContext context = new(options);
+            await SeedWithDefaultEvents(context);
+            return context;
+        }
+
+        public EventDbContext CreateNewEmptyDatabase()
+        {
+            DbContextOptions<EventDbContext> options = new DbContextOptionsBuilder<EventDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
+            EventDbContext context = new(options);
+            return context;
+        }
+
         public static async Task SeedWithDefaultEvents(EventDbContext context)
         {
-            if (context.Events.Any())
+            if (!context.Venues.Any())
             {
-                await ClearEventTableAsync(context);
+                context.Venues.AddRange(DummyData.venue1, DummyData.venue2);
             }
-            context.Events.AddRange(DummyData.event1, DummyData.event2);
+            if (!context.Events.Any())
+            {
+                context.Events.AddRange(DummyData.event1, DummyData.event2);
+            }
             await context.SaveChangesAsync();
+
         }
 
         public static async Task CreateManyEventEntries(EventDbContext context, int amount)

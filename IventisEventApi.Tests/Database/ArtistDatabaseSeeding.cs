@@ -7,6 +7,22 @@ namespace IventisEventApi.Tests.Database
 {
     internal class ArtistDatabaseSeeding
     {
+        public static async Task<EventDbContext> CreateNewDatabase()
+        {
+            DbContextOptions<EventDbContext> options = new DbContextOptionsBuilder<EventDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
+            EventDbContext context = new(options);
+            await SeedWithDefaultArtists(context);
+            return context;
+        }
+        
+        public static async Task<EventDbContext> CreateNewEmptyDatabase()
+        {
+            DbContextOptions<EventDbContext> options = new DbContextOptionsBuilder<EventDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
+            EventDbContext context = new(options);
+            return context;
+        }
+
+
         public static async Task SeedWithDefaultArtists(EventDbContext context)
         {
             if (context.Artists.Any())
