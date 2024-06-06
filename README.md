@@ -47,6 +47,34 @@ To setup the database follow the following instructions:
 
 This should setup the SQLite database with some inital entries in each table.
 
+## API Usage
+To use the API, run the program and navigate to the localhost port specified (e.g. `http://localhost:5250`)
+
+The main paths for the API are Artist, Event, and Venue. The default for each path gets all entities of that type (e.g. `http://localhost:5250/Artist` gets all artists)
+
+You can query by a specific field using the Artist/artistsByField, Event/eventsByField, and Venue/venuesByField routes. These require two values on the request, a field and a query.
+e.g. `http://localhost:5250/Artist/artistsByField?field=name&query=John%20Doe` returns the data for every Artist with the name John Doe.
+
+The following fields can be queried:
+### Artist
+- id
+- name
+- genre
+### Event
+- id
+- name
+- date
+- venueId
+### Venue
+- id
+- name
+
+A different path is available for seaching across relationships for Artist. If you want to get all Artists at an event, use the Artist/artistByEventId path. This takes a eventId value in the request.
+e.g. `http://localhost:5250/Artist/artistsByEventId?eventId=322EC951-1D88-4063-8920-2FD5831AA2C8`
+
+You can create a Venue by using the Venue/create path. This takes a name, bounding box (formatted as "lat1#long1#lat2#long2" or "lat1%23long1%23lat2%23long2") and a capacity. It will return the created Venue with its id.
+e.g. `https://localhost:5250/Venue/Create?name=Video&geoBoundingBox=1.0%232.0%233.0%234.0&capacity=1000`
+
 ## Proposed Improvements
 1. Generalise classes where possible to reduce instances of repeated code
 2. Add more validation where needed
