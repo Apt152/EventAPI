@@ -33,16 +33,17 @@ All packages should be able to be installed by navigating to each project folder
 
 You can build the project using `dotnet build`.
 
-You can run the project using `dotnet run` in the project folder.
+You can run the project using `dotnet run` in the project folder (ensure the database is created first).
 
-You can run the tests using `dotnet test` in the test project folder.
+You can run the tests using `dotnet test` in the test project folder. I would recommed doing so within Visual Studio however instead of on the command line as there are inconsistency problems currently with the database.
 
 ## Database Setup
 To setup the database follow the following instructions:
 1. In command prompt, navigate to ./IventisEventApi
-2. Verify the migration file exists in ./IventisEventApi/Migrations
-3. If it does not, run `dotnet ef migrations add InitialCreate`
-4. Run `dotnet ef database update`
+2. You will need dotnet-ef to create the database. Run `dotnet tool install --global dotnet-ef` to install
+3. Verify the migration file exists in ./IventisEventApi/Migrations
+4. If it does not, run `dotnet ef migrations add InitialCreate`
+5. Run `dotnet ef database update`
 
 This should setup the SQLite database with some inital entries in each table.
 
